@@ -1,8 +1,7 @@
-import builtins
 import os
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-import google.generativeai as genai
+from google import genai
 
 app = Flask(__name__)
 
@@ -11,9 +10,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lifeos.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# PASTE YOUR API KEY HERE
+# --- YOUR API KEY (Only defined once!) ---
 GOOGLE_API_KEY = ""
-genai.configure(api_key=GOOGLE_API_KEY)
 
 # --- DATABASE MODELS ---
 class Task(db.Model):
@@ -29,25 +27,34 @@ class User(db.Model):
     level = db.Column(db.Integer, default=1)
     total_xp = db.Column(db.Integer, default=0)
 
-# --- AI HELPER ---
-# REPLACE THE 'decide_points_with_ai' FUNCTION IN app.py WITH THIS:
-
+# --- AI HELPER FUNCTION ---
 def decide_points_with_ai(task_description):
     try:
-        # We use 'gemini-1.5-flash' as it is faster and free-tier friendly
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Initialize Client with the key
+        client = genai.Client(api_key=GOOGLE_API_KEY)
+        
         prompt = (
-            f"You are the LifeOS Game Master. Assess the difficulty of this task: '{task_description}'. "
-            "Reply with ONLY a single integer number between 10 (easy) and 100 (hard). "
-            "Examples: 'Wash spoon' -> 10, 'Run marathon' -> 100. "
-            "Do not write any text, just the number."
+            f"You are the LifeOS Game Master.\n"
+            f"Assess the difficulty of this task:\n"
+            f"Task: {task_description}\n\n"
+            "Rules:\n"
+            "- Assign XP strictly from: 5, 10, 20, 40, 50, 70\n"
+            "- Reply with ONLY the number\n"
         )
-        response = model.generate_content(prompt)
-        print(f"AI Thought: {response.text}") 
-        return int(response.text.strip())
-    except: # <--- CHANGED THIS LINE (Removed 'Exception as e')
-        print("AI ERROR: Could not connect to Gemini.")
-        return 10
+
+        response = client.models.generate_content(
+            model="gemini-flash-latest", # Using the reliable experimental model
+            contents=prompt
+        )
+
+        points = int(response.text.strip())
+        print(f"✅ AI JUDGEMENT: '{task_description}' = {points} XP")
+        return points
+
+    except Exception as e:
+        print(f"❌ AI ERROR: {e}")
+        return 10  # Fallback points if AI fails
+
 # --- ROUTES ---
 
 @app.route('/')
@@ -65,7 +72,6 @@ def dashboard():
 
     return render_template('dashboard.html', page='dashboard', user=user, tasks=tasks, task_percent=task_percent)
 
-# --- NEW: THESE WERE MISSING AND CAUSED THE ERROR ---
 @app.route('/tasks')
 def tasks():
     user = User.query.first()
@@ -81,12 +87,13 @@ def fitness():
 def social():
     user = User.query.first()
     return render_template('social.html', page='social', user=user)
-# ----------------------------------------------------
 
 @app.route('/add_task', methods=['POST'])
 def add_task():
     task_title = request.form.get('task_name')
     category = request.form.get('category')
+    
+    # Call AI Function
     ai_points = decide_points_with_ai(task_title)
     
     new_task = Task(title=task_title, category=category, xp=ai_points)
@@ -98,13 +105,16 @@ def add_task():
 def complete_task(task_id):
     task = Task.query.get(task_id)
     user = User.query.first()
+    
     if task and task.status == "Pending":
         task.status = "Done"
         user.total_xp += task.xp
         user.level = 1 + (user.total_xp // 500)
         db.session.commit()
+        
     return redirect(url_for('dashboard'))
 
+# Initialize Database
 with app.app_context():
     db.create_all()
 
