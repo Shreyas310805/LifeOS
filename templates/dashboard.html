@@ -1,67 +1,79 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="dashboard-grid">
+<div class="header">
+    <div class="welcome-text">
+        <h2>Hello, {{ user.name }}</h2>
+        <p>Focus on the process.</p>
+    </div>
+    <div class="level-badge">
+        ⭐ Level {{ user.level }}: {{ user.title if user.title else 'Novice' }}
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card xp-card">
+        <div class="xp-value">⚡ {{ user.total_xp }}</div>
+        <div class="xp-label">Total XP Earned</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="ring green"><div class="ring-text">69%</div></div>
+        <div class="stat-value">Fitness Goal</div>
+    </div>
     
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="ring blue"><div class="ring-text">{{ task_percent }}%</div></div>
-            <div class="stat-value">Task Focus</div>
+    <div class="stat-card">
+        <div class="ring orange"><div class="ring-text">67%</div></div>
+        <div class="stat-value">Calories</div>
+    </div>
+</div>
+
+<div class="ai-insight">
+    <div class="ai-avatar">AI</div>
+    <div class="ai-text">
+        <strong>LifeOS Coach</strong><br>
+        Welcome back! The AI is ready to judge your tasks. Add a new quest below.
+    </div>
+</div>
+
+<div class="card" style="margin-top: 1.5rem;">
+    <h3>➕ Add New Quest</h3>
+    <form action="{{ url_for('add_task') }}" method="POST" style="display: flex; gap: 10px; margin-top: 1rem;">
+        <input type="text" name="task_name" placeholder="E.g., Read 10 pages of OS..." required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white;">
+        
+        <select name="category" style="padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white;">
+            <option value="Academic">Academic</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Chore">Chore</option>
+            <option value="Work">Work</option>
+        </select>
+        
+        <button type="submit" class="verify-btn">Let AI Judge</button>
+    </form>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3>Active Quests</h3>
+    
+    {% for task in tasks %}
+    <div class="task-item">
+        <div class="task-info">
+            <h4>{{ task.title }}</h4>
+            <p>{{ task.category }} • <span style="color: #4ade80;">+{{ task.xp }} XP</span></p>
         </div>
-        <div class="stat-card">
-            <div class="ring green"><div class="ring-text">69%</div></div>
-            <div class="stat-value">Fitness Goal</div>
-        </div>
-        <div class="stat-card">
-            <div class="ring orange"><div class="ring-text">67%</div></div>
-            <div class="stat-value">Calories</div>
+        
+        <div class="task-actions">
+            {% if task.status == 'Pending' %}
+                <a href="{{ url_for('complete_task', task_id=task.id) }}" class="verify-btn">Complete</a>
+            {% else %}
+                <span class="status-done">Done ✓</span>
+            {% endif %}
+
+            <a href="{{ url_for('delete_task', task_id=task.id) }}" class="delete-btn" title="Delete Task">🗑️</a>
         </div>
     </div>
-
-    <div class="card ai-insight">
-        <div class="ai-avatar">AI</div>
-        <div>
-            <h4>LifeOS Coach</h4>
-            <p style="font-size: 0.9rem; opacity: 0.9;">
-                Welcome back! The AI is ready to judge your tasks. Add a new quest below.
-            </p>
-        </div>
-    </div>
-
-    <div class="card" style="margin-bottom: 0.5rem;">
-        <h3>➕ Add New Quest</h3>
-        <form action="/add_task" method="POST" style="display: flex; gap: 10px; margin-top: 1rem;">
-            <input type="text" name="task_name" placeholder="E.g., Read 10 pages of OS..." required 
-                   style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white;">
-            
-            <select name="category" style="padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white;">
-                <option value="Academic">Academic</option>
-                <option value="Fitness">Fitness</option>
-                <option value="Chore">Chore</option>
-            </select>
-
-            <button type="submit" class="verify-btn" style="background: var(--accent-blue); color: white;">Let AI Judge</button>
-        </form>
-    </div>
-
-    <div class="card task-list">
-        <h3>Active Quests</h3>
-        {% for task in tasks %}
-            <div class="task-item" style="opacity: {% if task.status == 'Done' %}0.5{% else %}1{% endif %}">
-                <div class="task-info">
-                    <h4>{{ task.title }}</h4>
-                    <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                        Reward: <b style="color: var(--accent-green)">{{ task.xp }} XP</b> • {{ task.category }}
-                    </p>
-                </div>
-                {% if task.status == 'Pending' %}
-                    <a href="{{ url_for('complete_task', task_id=task.id) }}" class="verify-btn">Complete</a>
-                {% else %}
-                    <span style="color: var(--accent-green); font-weight: bold;">Done ✓</span>
-                {% endif %}
-            </div>
-        {% endfor %}
-    </div>
+    {% endfor %}
 
 </div>
+
 {% endblock %}

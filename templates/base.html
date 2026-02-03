@@ -28,15 +28,7 @@
     </div>
 
     <div class="main-content">
-        <div class="header">
-            <div>
-                <h2>Hello, {{ user.name }}</h2>
-                <p style="color: var(--text-secondary);">Focus on the process.</p>
-            </div>
-            <div class="level-badge">
-                ⭐ Level {{ user.level }}: {{ user.title }}
-            </div>
-        </div>
+        
 
         {% block content %}{% endblock %}
     </div>

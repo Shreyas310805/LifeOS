@@ -10,7 +10,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lifeos.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# --- YOUR API KEY (Only defined once!) ---
+# --- YOUR API KEY ---
 GOOGLE_API_KEY = ""
 
 # --- DATABASE MODELS ---
@@ -30,7 +30,6 @@ class User(db.Model):
 # --- AI HELPER FUNCTION ---
 def decide_points_with_ai(task_description):
     try:
-        # Initialize Client with the key
         client = genai.Client(api_key=GOOGLE_API_KEY)
         
         prompt = (
@@ -43,7 +42,7 @@ def decide_points_with_ai(task_description):
         )
 
         response = client.models.generate_content(
-            model="gemini-flash-latest", # Using the reliable experimental model
+            model="gemini-exp-1206", # Using the reliable experimental model
             contents=prompt
         )
 
@@ -53,7 +52,7 @@ def decide_points_with_ai(task_description):
 
     except Exception as e:
         print(f"❌ AI ERROR: {e}")
-        return 10  # Fallback points if AI fails
+        return 10 
 
 # --- ROUTES ---
 
@@ -114,7 +113,16 @@ def complete_task(task_id):
         
     return redirect(url_for('dashboard'))
 
-# Initialize Database
+
+@app.route('/delete/<int:task_id>')
+def delete_task(task_id):
+    task = Task.query.get(task_id)
+    if task:
+        db.session.delete(task)
+        db.session.commit()
+    return redirect(url_for('dashboard'))
+# ----------------------------------------------------
+
 with app.app_context():
     db.create_all()
 
