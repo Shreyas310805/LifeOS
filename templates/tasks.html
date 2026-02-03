@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h3>✅ Task Manager</h3>
+    <br>
+    <p>This is your dedicated task page. All your quests are listed here.</p>
+    
+    <div style="margin-top: 1rem;">
+        {% for task in tasks %}
+            <div class="task-item">
+                <h4>{{ task.title }}</h4>
+                <p>{{ task.category }} • {{ task.xp }} XP</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

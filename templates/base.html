@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LifeOS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">LifeOS 🧬</div>
+        
+        <a href="{{ url_for('dashboard') }}" class="nav-item {% if page == 'dashboard' %}active{% endif %}">
+            <div class="nav-icon">🏠</div> <span>Dashboard</span>
+        </a>
+        
+        <a href="{{ url_for('tasks') }}" class="nav-item {% if page == 'tasks' %}active{% endif %}">
+            <div class="nav-icon">✅</div> <span>Task Manager</span>
+        </a>
+        
+        <a href="{{ url_for('fitness') }}" class="nav-item {% if page == 'fitness' %}active{% endif %}">
+            <div class="nav-icon">💪</div> <span>Fitness Log</span>
+        </a>
+        
+        <a href="{{ url_for('social') }}" class="nav-item {% if page == 'social' %}active{% endif %}">
+            <div class="nav-icon">🏆</div> <span>Social Hub</span>
+        </a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Hello, {{ user.name }}</h2>
+                <p style="color: var(--text-secondary);">Focus on the process.</p>
+            </div>
+            <div class="level-badge">
+                ⭐ Level {{ user.level }}: {{ user.title }}
+            </div>
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>
