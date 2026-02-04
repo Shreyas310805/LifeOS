@@ -1,8 +1,63 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="card">
-    <h3>💪 Fitness Log</h3>
-    <br>
-    <p>Fitness tracking features coming soon!</p>
+<div class="header">
+    <div class="welcome-text">
+        <h2>💪 Fitness Log</h2>
+        <p>Track your physical progress.</p>
+    </div>
+    
+    {% if user.is_connected %}
+        <div style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            {% if user.profile_pic %}
+                <img src="{{ user.profile_pic }}" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid #4ade80;">
+            {% else %}
+                <span style="font-size: 1.5rem;">👤</span>
+            {% endif %}
+            
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <span style="font-size: 0.8rem; color: #4ade80; font-weight: bold;">Connected</span>
+                <a href="{{ url_for('logout_fit') }}" style="font-size: 0.75rem; color: #ef4444; text-decoration: none;">Disconnect</a>
+            </div>
+        </div>
+    {% else %}
+        <a href="{{ url_for('login_google') }}" class="verify-btn" style="background: #4285F4; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+            <span>🔄</span> Sync with Google Fit
+        </a>
+    {% endif %}
 </div>
+
+<div class="stats-row" style="margin-top: 2rem;">
+    
+    <div class="stat-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid #334155;">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">👣</div>
+        <div class="stat-value" style="color: #4ade80; font-size: 2.5rem;">
+            {{ user.steps if user.steps else 0 }}
+        </div>
+        <div class="xp-label">Steps Today</div>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid #334155;">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔥</div>
+        <div class="stat-value" style="color: #fb923c; font-size: 2.5rem;">
+            {{ user.calories if user.calories else 0 }}
+        </div>
+        <div class="xp-label">Calories Burned</div>
+    </div>
+
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3>Daily Insight</h3>
+    <p style="color: #94a3b8; line-height: 1.6;">
+        {% if user.steps > 5000 %}
+            🚀 <strong>Crushing it!</strong> You are active and burning energy. Keep it up!
+        {% elif user.steps > 2000 %}
+            🚶 <strong>Good start!</strong> Try to take a 10-minute walk this evening to hit your goal.
+        {% else %}
+            😴 <strong>Low activity detected.</strong> Time to stand up, stretch, and get some water!
+        {% endif %}
+    </p>
+</div>
+
 {% endblock %}

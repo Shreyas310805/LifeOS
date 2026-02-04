@@ -18,13 +18,34 @@
     </div>
 
     <div class="stat-card">
-        <div class="ring green"><div class="ring-text">69%</div></div>
-        <div class="stat-value">Fitness Goal</div>
+        {% if user.is_connected %}
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    {% if user.profile_pic %}
+                        <img src="{{ user.profile_pic }}" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #4ade80;">
+                    {% else %}
+                         <span style="font-size: 1.5rem;">👤</span>
+                    {% endif %}
+                    <span style="color: #4ade80; font-weight: bold; font-size: 1.2rem;">{{ user.steps }}</span>
+                </div>
+                
+                <div style="font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; gap: 5px;">
+                    Steps Today 
+                    <a href="{{ url_for('logout_fit') }}" style="color: #ef4444; text-decoration: none; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">Disconnect</a>
+                </div>
+            </div>
+        {% else %}
+            <a href="{{ url_for('login_google') }}" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #4ade80; background: rgba(74, 222, 128, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid #4ade80; transition: 0.2s;">
+                <span>🔗</span> 
+                <span style="font-weight: bold;">Sync Google Fit</span>
+            </a>
+            <div class="stat-value" style="margin-top: 8px; font-size: 0.85rem; color: #64748b;">Tap to Connect</div>
+        {% endif %}
     </div>
     
     <div class="stat-card">
-        <div class="ring orange"><div class="ring-text">67%</div></div>
-        <div class="stat-value">Calories</div>
+        <div class="ring orange"><div class="ring-text">{{ user.calories }}</div></div>
+        <div class="stat-value">Calories Burned</div>
     </div>
 </div>
 
