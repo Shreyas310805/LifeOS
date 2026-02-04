@@ -30,7 +30,10 @@ class Task(db.Model):
     category = db.Column(db.String(50), nullable=False)
     xp = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(20), default="Pending")
-
+    
+   
+    due_date = db.Column(db.String(20), nullable=True) 
+    due_time = db.Column(db.String(20), nullable=True)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), default="Shreyas")
@@ -201,11 +204,23 @@ def social():
 def add_task():
     task_title = request.form.get('task_name')
     category = request.form.get('category')
+    
+    # 👇 GET DATE & TIME FROM FORM
+    due_date = request.form.get('due_date')
+    due_time = request.form.get('due_time')
+    
     ai_points = decide_points_with_ai(task_title)
-    new_task = Task(title=task_title, category=category, xp=ai_points)
+    
+    new_task = Task(
+        title=task_title, 
+        category=category, 
+        xp=ai_points,
+        due_date=due_date, # Save it
+        due_time=due_time  # Save it
+    )
     db.session.add(new_task)
     db.session.commit()
-    return redirect(url_for('dashboard'))
+    return redirect(request.referrer) # Reloads the same page you were on
 
 @app.route('/complete/<int:task_id>')
 def complete_task(task_id):
@@ -228,6 +243,42 @@ def delete_task(task_id):
 
 with app.app_context():
     db.create_all()
+# --- LIFEY AI COMPANION ---
+@app.route('/ask_lifey', methods=['POST'])
+def ask_lifey():
+    user_message = request.json.get('message')
+    
+    # 1. Gather Context (What is happening in your life right now?)
+    user = User.query.first()
+    tasks = Task.query.all()
+    
+    task_list = "\n".join([f"- {t.title} ({t.status}, {t.xp} XP)" for t in tasks])
+    fitness_status = f"Steps: {user.steps}, Calories: {user.calories}"
+    task_list = "\n".join([
+        f"- {t.title} (Due: {t.due_date} at {t.due_time}, Status: {t.status}, XP: {t.xp})" 
+        for t in tasks
+    ])
+    # 2. Construct the Prompt
+    context_prompt = (
+        f"You are 'Lifey', a smart, motivating productivity AI for Shreyas.\n"
+        f"Current Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
+        f"User's Fitness: {fitness_status}\n"
+        f"User's Tasks:\n{task_list}\n\n"
+        "User Question: " + user_message + "\n\n"
+        "Rules:\n"
+        "1. If fitness is low (<500 steps), gently nag them to move.\n"
+        "2. If they ask about tasks, use the list above.\n"
+        "3. Keep answers short (under 50 words) and friendly.\n"
+        "4. If a task seems vague, suggest a better way to do it."
+    )
+
+    try:
+        genai.configure(api_key=GOOGLE_API_KEY)
+        model = genai.GenerativeModel('gemini-flash-latest')
+        response = model.generate_content(context_prompt)
+        return {"reply": response.text.strip()}
+    except Exception as e:
+        return {"reply": "I'm having a brain freeze! 🧊 Try again."}
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

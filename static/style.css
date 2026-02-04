@@ -133,3 +133,93 @@ body { background-color: var(--bg-color); color: var(--text-primary); display: f
     font-weight: bold;
     font-size: 0.9rem;
 }
+/* --- LIFEY WIDGET --- */
+#lifey-icon {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border-radius: 50%;
+    color: white;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);
+    transition: transform 0.2s;
+    z-index: 1000;
+}
+
+#lifey-icon:hover {
+    transform: scale(1.1);
+}
+
+#lifey-chat-window {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 350px;
+    height: 450px;
+    background: #1e293b;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    flex-direction: column;
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.chat-header {
+    padding: 15px;
+    background: #0f172a;
+    border-bottom: 1px solid #334155;
+    border-radius: 12px 12px 0 0;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-content {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+}
+
+.chat-input-area {
+    padding: 10px;
+    border-top: 1px solid #334155;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: white;
+}
+
+.ai-msg {
+    background: #334155;
+    padding: 8px 12px;
+    border-radius: 10px 10px 10px 0;
+    margin-bottom: 10px;
+    align-self: flex-start;
+    max-width: 80%;
+}
+
+.user-msg {
+    background: #6366f1;
+    padding: 8px 12px;
+    border-radius: 10px 10px 0 10px;
+    margin-bottom: 10px;
+    margin-left: auto; /* Push to right */
+    width: fit-content;
+    max-width: 80%;
+}

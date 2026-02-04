@@ -1,17 +1,74 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="card">
-    <h3>✅ Task Manager</h3>
-    <br>
-    <p>This is your dedicated task page. All your quests are listed here.</p>
-    
-    <div style="margin-top: 1rem;">
-        {% for task in tasks %}
-            <div class="task-item">
-                <h4>{{ task.title }}</h4>
-                <p>{{ task.category }} • {{ task.xp }} XP</p>
-            </div>
-        {% endfor %}
+<div class="header">
+    <div class="welcome-text">
+        <h2>📅 Task Planner</h2>
+        <p>Manage your schedule & deadlines.</p>
     </div>
+</div>
+
+<div class="card" style="margin-top: 20px;">
+    <h3>Add New Task</h3>
+    <form action="/add_task" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+        
+        <div style="flex: 2; min-width: 200px;">
+            <label style="font-size: 0.8rem; color: #94a3b8;">Task Name</label>
+            <input type="text" name="task_name" placeholder="e.g. Submit Project" required 
+                   style="width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px;">
+        </div>
+
+        <div style="flex: 1; min-width: 120px;">
+            <label style="font-size: 0.8rem; color: #94a3b8;">Category</label>
+            <select name="category" style="width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px;">
+                <option value="Work">💼 Work</option>
+                <option value="Personal">🏠 Personal</option>
+                <option value="Health">💪 Health</option>
+                <option value="Learning">📚 Learning</option>
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 130px;">
+            <label style="font-size: 0.8rem; color: #94a3b8;">Due Date</label>
+            <input type="date" name="due_date" 
+                   style="width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px;">
+        </div>
+
+        <div style="flex: 1; min-width: 100px;">
+            <label style="font-size: 0.8rem; color: #94a3b8;">Time</label>
+            <input type="time" name="due_time" 
+                   style="width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px;">
+        </div>
+
+        <button type="submit" class="add-btn" style="height: 42px; padding: 0 20px;">+ Add</button>
+    </form>
+</div>
+
+<div class="task-list" style="margin-top: 20px;">
+    {% for task in tasks %}
+    <div class="task-card">
+        <div class="task-info">
+            <div class="task-title">{{ task.title }}</div>
+            <div class="task-meta">
+                <span class="category-tag">{{ task.category }}</span>
+                <span class="xp-tag">✨ {{ task.xp }} XP</span>
+                
+                {% if task.due_date %}
+                    <span style="font-size: 0.8rem; color: #fb923c; margin-left: 10px;">
+                        ⏰ {{ task.due_date }} {% if task.due_time %} at {{ task.due_time }} {% endif %}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="task-actions">
+            {% if task.status == "Pending" %}
+                <a href="/complete/{{ task.id }}" class="check-btn">✔</a>
+            {% else %}
+                <span style="color: #4ade80;">Done</span>
+            {% endif %}
+            <a href="/delete/{{ task.id }}" class="delete-btn">✖</a>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

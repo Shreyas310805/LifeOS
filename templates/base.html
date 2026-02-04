@@ -32,6 +32,62 @@
 
         {% block content %}{% endblock %}
     </div>
+<div id="lifey-icon" onclick="toggleChat()">
+    🤖
+</div>
+
+<div id="lifey-chat-window">
+    <div class="chat-header">
+        <span>Chat with Lifey</span>
+        <span onclick="toggleChat()" style="cursor: pointer;">✖</span>
+    </div>
+    <div id="chat-content" class="chat-content">
+        <div class="ai-msg">Hi Shreyas! I'm Lifey. How can I help you crush your goals today? 🚀</div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="user-input" placeholder="Ask about tasks or fitness..." onkeypress="handleEnter(event)">
+        <button onclick="sendMessage()">➤</button>
+    </div>
+</div>
+
+<script>
+    function toggleChat() {
+        var chat = document.getElementById("lifey-chat-window");
+        chat.style.display = chat.style.display === "none" || chat.style.display === "" ? "flex" : "none";
+    }
+
+    function handleEnter(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
+
+    async function sendMessage() {
+        var input = document.getElementById("user-input");
+        var content = document.getElementById("chat-content");
+        var text = input.value;
+        if (!text) return;
+
+        // User Message
+        content.innerHTML += `<div class="user-msg">${text}</div>`;
+        input.value = "";
+        content.scrollTop = content.scrollHeight;
+
+        // Send to Backend
+        try {
+            const response = await fetch('/ask_lifey', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await response.json();
+            
+            // AI Reply
+            content.innerHTML += `<div class="ai-msg">${data.reply}</div>`;
+            content.scrollTop = content.scrollHeight;
+        } catch (error) {
+            content.innerHTML += `<div class="ai-msg">Error contacting Lifey :(</div>`;
+        }
+    }
+</script>
 
 </body>
 </html>
