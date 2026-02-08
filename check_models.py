@@ -2,7 +2,7 @@ from google import genai
 import os
 
 
-GOOGLE_API_KEY = "AIzaSyBch14nFNC8B8SveXEkqJSfJPkGfR09INY"
+GOOGLE_API_KEY = ""
 
 client = genai.Client(api_key=GOOGLE_API_KEY)
 
