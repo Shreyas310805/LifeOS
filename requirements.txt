@@ -1,7 +1,31 @@
-fastapi
-uvicorn
-sqlalchemy
-pydantic
-google-generativeai
-python-dotenv
-python-multipart
+# Web Framework
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+Flask-Migrate==4.0.5
+Flask-CORS==4.0.0
+Werkzeug==3.0.1
+
+# Database
+psycopg2-binary==2.9.9
+SQLAlchemy==2.0.25
+
+# AI - Google Gemini (REPLACED OPENAI)
+google-generativeai==0.3.2
+
+# Data & Visualization
+pandas==2.1.4
+numpy==1.26.3
+plotly==5.18.0
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+Pillow==10.2.0
+email-validator==2.1.0
+
+# Development
+pytest==7.4.4
+black==23.12.1
+flake8==7.0.0

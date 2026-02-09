@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Health Metrics</h1>
+
+<form method="POST" action="{{ url_for('health.add') }}">
+    <select name="metric_type" required>
+        <option value="heart_rate">Heart Rate</option>
+        <option value="weight">Weight</option>
+        <option value="steps">Steps</option>
+        <option value="blood_pressure">Blood Pressure</option>
+    </select>
+    <input type="number" step="0.1" name="value" placeholder="Value" required>
+    <input type="text" name="unit" placeholder="Unit (bpm, kg, etc)" required>
+    <input type="text" name="notes" placeholder="Notes (optional)">
+    <button type="submit">Add Metric</button>
+</form>
+
+<table>
+    <tr>
+        <th>Type</th>
+        <th>Value</th>
+        <th>Date</th>
+    </tr>
+    {% for metric in metrics %}
+    <tr>
+        <td>{{ metric.metric_type }}</td>
+        <td>{{ metric.value }} {{ metric.unit }}</td>
+        <td>{{ metric.recorded_at.strftime('%Y-%m-%d') }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+<h2>Log New Metric</h2>
+<form method="POST" action="{{ url_for('health.add') }}">
+    <select name="metric_type" required>
+        <option value="heart_rate">Heart Rate</option>
+        <option value="weight">Weight</option>
+        <option value="steps">Steps</option>
+    </select>
+    <input type="number" step="0.1" name="value" placeholder="Value" required>
+    <input type="text" name="unit" placeholder="Unit" required>
+    <button type="submit">Add</button>
+</form>

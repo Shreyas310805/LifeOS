@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Sleep Tracker</h1>
+
+<form method="POST" action="{{ url_for('sleep.add') }}">
+    <label>Sleep Start:</label>
+    <input type="datetime-local" name="sleep_start" required>
+    <label>Sleep End:</label>
+    <input type="datetime-local" name="sleep_end" required>
+    <input type="number" name="quality" min="1" max="10" placeholder="Quality (1-10)">
+    <textarea name="notes" placeholder="Notes"></textarea>
+    <button type="submit">Log Sleep</button>
+</form>
+
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Duration</th>
+        <th>Quality</th>
+    </tr>
+    {% for session in sessions %}
+    <tr>
+        <td>{{ session.sleep_start.strftime('%Y-%m-%d') }}</td>
+        <td>{{ session.duration_minutes // 60 }}h {{ session.duration_minutes % 60 }}m</td>
+        <td>{{ session.sleep_quality }}/10</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

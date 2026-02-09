@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Nutrition Tracker</h1>
+
+<form method="POST" action="{{ url_for('nutrition.add') }}">
+    <input type="text" name="meal_name" placeholder="Meal name" required>
+    <select name="meal_type">
+        <option value="breakfast">Breakfast</option>
+        <option value="lunch">Lunch</option>
+        <option value="dinner">Dinner</option>
+        <option value="snack">Snack</option>
+    </select>
+    <input type="number" name="calories" placeholder="Calories">
+    <input type="number" step="0.1" name="protein" placeholder="Protein (g)">
+    <input type="number" step="0.1" name="carbs" placeholder="Carbs (g)">
+    <input type="number" step="0.1" name="fat" placeholder="Fat (g)">
+    <button type="submit">Log Meal</button>
+</form>
+
+<table>
+    <tr>
+        <th>Meal</th>
+        <th>Calories</th>
+        <th>Date</th>
+    </tr>
+    {% for meal in meals %}
+    <tr>
+        <td>{{ meal.meal_name }}</td>
+        <td>{{ meal.total_calories }}</td>
+        <td>{{ meal.logged_at.strftime('%Y-%m-%d') }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
