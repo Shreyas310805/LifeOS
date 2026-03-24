@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="text-align: center; margin-bottom: 40px;">
+    <h1>
+        <i class="fa-solid fa-user-doctor" style="color: black; margin-right: 10px;"></i>
+        Medical Bay
+    </h1>
+    <p style="color: #6B7280;">Manage your biological status and prescriptions.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    
+    <div class="card">
+        <h3><i class="fa-solid fa-file-medical" style="color: black; margin-right: 8px;"></i> Health Profile</h3>
+        <p style="font-size: 0.9rem; color: #6B7280;">The AI uses this to warn you about dangerous tasks.</p>
+        
+        <form action="/update_conditions" method="POST">
+            <label>Known Conditions</label>
+            <textarea name="conditions" rows="4" 
+                      style="width: 100%; padding: 15px; border: 2px solid #E5E7EB; border-radius: 10px; font-family: 'Inter';"
+                      placeholder="e.g. Asthma, High Blood Pressure...">{{ user.health_conditions }}</textarea>
+            <button type="submit" style="margin-top: 15px; background: black; color: white;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Profile
+            </button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3><i class="fa-solid fa-plus" style="color: black; margin-right: 8px;"></i> Add Medicine</h3>
+        <form action="/add_med" method="POST">
+            <label>Medicine Name</label>
+            <input type="text" name="med_name" placeholder="e.g. Metformin 500mg" required>
+            
+            <label>Time to Take</label>
+            <input type="time" name="med_time" required>
+            
+            <button type="submit" class="add-btn" style="background: black; color: white;">
+                <i class="fa-solid fa-clock"></i> Add to Schedule
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <h3>
+        <i class="fa-solid fa-calendar-check" style="color: black; margin-right: 8px;"></i> 
+        Daily Schedule
+    </h3>
+    
+    {% if meds|length == 0 %}
+        <div style="text-align: center; padding: 30px; color: #9CA3AF; border: 2px dashed #E5E7EB; border-radius: 12px;">
+            <i class="fa-solid fa-check-circle" style="font-size: 1.5rem; margin-bottom: 10px; display: block;"></i>
+            No medications scheduled. Stay healthy!
+        </div>
+    {% else %}
+        {% for med in meds %}
+        <div class="task-card" style="border-left: 5px solid {% if med.taken %}#000000{% else %}#D1D5DB{% endif %};">
+            <div>
+                <div class="task-title" style="font-size: 1.1rem; {% if med.taken %}text-decoration: line-through; color: #9CA3AF;{% endif %}">
+                    <i class="fa-solid fa-pills" style="color: #6B7280; margin-right: 8px;"></i>
+                    {{ med.name }}
+                </div>
+                <div class="task-meta">
+                    <span style="background: #F3F4F6; color: black; padding: 4px 10px; border-radius: 5px; font-weight: bold; font-size: 0.8rem;">
+                        <i class="fa-regular fa-clock"></i> {{ med.time }}
+                    </span>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 15px;">
+                {% if med.taken %}
+                    <a href="/toggle_med/{{ med.id }}" style="color: black; font-weight: bold; text-decoration: none;">
+                        <i class="fa-solid fa-check-double"></i> Taken
+                    </a>
+                {% else %}
+                    <a href="/toggle_med/{{ med.id }}" style="background: black; color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                        Mark Taken
+                    </a>
+                {% endif %}
+                
+                <a href="/delete_med/{{ med.id }}" style="color: #9CA3AF;"><i class="fa-solid fa-trash"></i></a>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="card" style="background: #000000; color: white; margin-top: 40px; padding: 30px; border-radius: 16px;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 50%;">
+                <i class="fa-solid fa-robot" style="font-size: 2rem; color: white;"></i>
+            </div>
+            <div>
+                <h2 style="margin: 0; font-size: 1.5rem;">AI Health Guardian</h2>
+                <p style="margin: 5px 0 0 0; color: #9CA3AF; font-size: 0.95rem;">
+                    Monitoring your vitals and conditions.
+                </p>
+            </div>
+        </div>
+        
+        <button onclick="document.getElementById('lifey-chat-window').style.display='flex'" style="background: white; color: black; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
+            <i class="fa-solid fa-stethoscope"></i> Consult Dr. AI
+        </button>
+    </div>
+
+    <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
+
+    <div style="display: flex; gap: 15px; font-size: 0.9rem; color: #D1D5DB;">
+        <span><i class="fa-solid fa-circle-check" style="color: #10B981;"></i> Asthma Protocol: <strong>Active</strong></span>
+        <span><i class="fa-solid fa-circle-check" style="color: #10B981;"></i> Med Interaction Check: <strong>Safe</strong></span>
+    </div>
+</div>
+
+{% endblock %}

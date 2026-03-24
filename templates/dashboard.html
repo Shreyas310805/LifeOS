@@ -1,100 +1,193 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="header">
-    <div class="welcome-text">
-        <h2>Hello, {{ user.name }}</h2>
-        <p>Focus on the process.</p>
+
+<style>
+    .minimal-section {
+        max-width: 800px;
+        margin: 0 auto 80px auto; /* Lots of vertical breathing room */
+    }
+
+    /* Scroll Animation Classes */
+    .reveal {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Sleek Stats Redesign */
+    .sleek-stats {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+    .sleek-stat-box {
+        flex: 1;
+        background: white;
+        border: 1px solid #E5E7EB;
+        border-radius: 16px;
+        padding: 40px 20px;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    .sleek-stat-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+    
+    .quote-text {
+        font-size: 1.2rem;
+        color: #6B7280;
+        font-style: italic;
+        margin-top: 15px;
+        font-weight: 300;
+    }
+</style>
+
+<div class="minimal-section reveal active" style="text-align: center; margin-top: 40px; margin-bottom: 100px;">
+    <h1 style="font-size: 3rem; margin-bottom: 10px; font-weight: 900; letter-spacing: -1px;">
+        Hello, {{ user.name }}.
+    </h1>
+    <p id="daily-quote" class="quote-text">Loading protocol...</p>
+</div>
+
+<div class="minimal-section reveal sleek-stats">
+    <div class="sleek-stat-box">
+        <i class="fa-solid fa-medal" style="font-size: 2rem; color: black; margin-bottom: 15px;"></i>
+        <div style="font-size: 2.5rem; font-weight: 900; color: black; line-height: 1;">{{ user.level }}</div>
+        <div style="font-size: 0.8rem; color: #9CA3AF; font-weight: bold; letter-spacing: 1px; margin-top: 10px;">CURRENT RANK</div>
     </div>
-    <div class="level-badge">
-        ⭐ Level {{ user.level }}: {{ user.title if user.title else 'Novice' }}
+    
+    <div class="sleek-stat-box">
+        <i class="fa-solid fa-bolt" style="font-size: 2rem; color: black; margin-bottom: 15px;"></i>
+        <div style="font-size: 2.5rem; font-weight: 900; color: black; line-height: 1;">{{ user.total_xp }}</div>
+        <div style="font-size: 0.8rem; color: #9CA3AF; font-weight: bold; letter-spacing: 1px; margin-top: 10px;">TOTAL XP</div>
+    </div>
+
+    <div class="sleek-stat-box">
+        <i class="fa-solid fa-fire" style="font-size: 2rem; color: black; margin-bottom: 15px;"></i>
+        <div style="font-size: 2.5rem; font-weight: 900; color: black; line-height: 1;">3</div>
+        <div style="font-size: 0.8rem; color: #9CA3AF; font-weight: bold; letter-spacing: 1px; margin-top: 10px;">DAY STREAK</div>
     </div>
 </div>
 
-<div class="stats-row">
-    <div class="stat-card xp-card">
-        <div class="xp-value">⚡ {{ user.total_xp }}</div>
-        <div class="xp-label">Total XP Earned</div>
-    </div>
-
-    <div class="stat-card">
-        {% if user.is_connected %}
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                    {% if user.profile_pic %}
-                        <img src="{{ user.profile_pic }}" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #4ade80;">
-                    {% else %}
-                         <span style="font-size: 1.5rem;">👤</span>
-                    {% endif %}
-                    <span style="color: #4ade80; font-weight: bold; font-size: 1.2rem;">{{ user.steps }}</span>
-                </div>
-                
-                <div style="font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; gap: 5px;">
-                    Steps Today 
-                    <a href="{{ url_for('logout_fit') }}" style="color: #ef4444; text-decoration: none; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">Disconnect</a>
-                </div>
+<div class="minimal-section reveal">
+    <div class="card" style="padding: 40px; border-radius: 16px; border: 1px solid #E5E7EB; box-shadow: 0 20px 40px rgba(0,0,0,0.03);">
+        <h3 style="display: flex; justify-content: space-between; align-items: center; margin-top: 0; font-size: 1.5rem; border-bottom: 2px solid #F3F4F6; padding-bottom: 20px;">
+            <span><i class="fa-solid fa-radar" style="margin-right: 12px;"></i> Active Radar</span>
+            
+            {% set pending_tasks = tasks|selectattr("status", "equalto", "Pending")|list %}
+            <span style="background: black; color: white; padding: 6px 16px; border-radius: 30px; font-size: 0.85rem;">
+                {{ pending_tasks|length }} Targets
+            </span>
+        </h3>
+        
+        {% if pending_tasks|length == 0 %}
+            <div style="text-align: center; padding: 50px 0; color: #9CA3AF;">
+                <i class="fa-solid fa-check-double" style="font-size: 3rem; margin-bottom: 15px; color: #D1D5DB;"></i>
+                <p style="margin: 0; font-size: 1.1rem;">All clear. Your queue is empty.</p>
             </div>
         {% else %}
-            <a href="{{ url_for('login_google') }}" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #4ade80; background: rgba(74, 222, 128, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid #4ade80; transition: 0.2s;">
-                <span>🔗</span> 
-                <span style="font-weight: bold;">Sync Google Fit</span>
-            </a>
-            <div class="stat-value" style="margin-top: 8px; font-size: 0.85rem; color: #64748b;">Tap to Connect</div>
-        {% endif %}
-    </div>
-    
-    <div class="stat-card">
-        <div class="ring orange"><div class="ring-text">{{ user.calories }}</div></div>
-        <div class="stat-value">Calories Burned</div>
-    </div>
-</div>
-
-<div class="ai-insight">
-    <div class="ai-avatar">AI</div>
-    <div class="ai-text">
-        <strong>LifeOS Coach</strong><br>
-        Welcome back! The AI is ready to judge your tasks. Add a new quest below.
-    </div>
-</div>
-
-<div class="card" style="margin-top: 1.5rem;">
-    <h3>➕ Add Quick Task</h3>
-    <form action="{{ url_for('add_task') }}" method="POST" style="display: flex; gap: 10px; margin-top: 1rem;">
-        <input type="text" name="task_name" placeholder="E.g., Read 10 pages of OS..." required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white;">
-        
-        <select name="category" style="padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white;">
-            <option value="Academic">Academic</option>
-            <option value="Fitness">Fitness</option>
-            <option value="Chore">Chore</option>
-            <option value="Work">Work</option>
-        </select>
-        
-        <button type="submit" class="verify-btn">Let AI Judge</button>
-    </form>
-</div>
-
-<div class="card" style="margin-top: 2rem;">
-    <h3>Active Quests</h3>
-    
-    {% for task in tasks %}
-    <div class="task-item">
-        <div class="task-info">
-            <h4>{{ task.title }}</h4>
-            <p>{{ task.category }} • <span style="color: #4ade80;">+{{ task.xp }} XP</span></p>
-        </div>
-        
-        <div class="task-actions">
-            {% if task.status == 'Pending' %}
-                <a href="{{ url_for('complete_task', task_id=task.id) }}" class="verify-btn">Complete</a>
-            {% else %}
-                <span class="status-done">Done ✓</span>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
+                {% for task in pending_tasks[:3] %}
+                <div style="border-left: 4px solid black; padding: 20px; background: #F9FAFB; border-radius: 8px; transition: background 0.2s;">
+                    <div style="font-weight: bold; font-size: 1.1rem; color: black; margin-bottom: 8px;">{{ task.title }}</div>
+                    <div style="font-size: 0.85rem; color: #6B7280;">
+                        <span style="background: white; border: 1px solid #E5E7EB; padding: 4px 10px; border-radius: 6px; color: black; font-weight: bold; margin-right: 10px;">
+                            <i class="fa-solid fa-bolt"></i> {{ task.xp }} XP
+                        </span>
+                        {{ task.category }}
+                        {% if task.due_date %} <span style="margin-left: 10px; color: #DC2626;"><i class="fa-regular fa-clock"></i> {{ task.due_date }}</span>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if pending_tasks|length > 3 %}
+                <p style="text-align: center; font-size: 0.9rem; color: #9CA3AF; margin-top: 25px; font-weight: 500;">
+                    + {{ pending_tasks|length - 3 }} more targets hidden in queue...
+                </p>
             {% endif %}
+        {% endif %}
 
-            <a href="{{ url_for('delete_task', task_id=task.id) }}" class="delete-btn" title="Delete Task">🗑️</a>
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/tasks" style="display: inline-block; background: black; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 1rem; transition: transform 0.2s; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                Open Task Manager <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i>
+            </a>
         </div>
     </div>
-    {% endfor %}
-
 </div>
+
+<div class="minimal-section reveal">
+    <div style="background: black; color: white; border-radius: 16px; padding: 50px;">
+        <h3 style="color: white; font-size: 1.8rem; margin-top: 0; margin-bottom: 20px;">
+            <i class="fa-solid fa-microchip" style="margin-right: 12px;"></i> System Architecture
+        </h3>
+        <p style="color: #9CA3AF; line-height: 1.8; font-size: 1.1rem; margin-bottom: 30px;">
+            <strong style="color: white;">LifeOS</strong> is your gamified personal operating system. It acts as a central node, merging task execution, biological tracking, and AI-driven insights to optimize your daily output.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; color: #D1D5DB; font-size: 0.95rem; line-height: 1.6;">
+            <div>
+                <strong style="color: white; display: block; margin-bottom: 5px;"><i class="fa-solid fa-bullseye"></i> Tasks</strong>
+                Log missions. The AI automatically assigns XP based on difficulty.
+            </div>
+            <div>
+                <strong style="color: white; display: block; margin-bottom: 5px;"><i class="fa-solid fa-heart-pulse"></i> Fitness</strong>
+                Sync Google Fit to monitor your physical hardware and steps.
+            </div>
+            <div>
+                <strong style="color: white; display: block; margin-bottom: 5px;"><i class="fa-solid fa-user-doctor"></i> Medical</strong>
+                Track vitals and conditions so the AI can prevent unsafe activities.
+            </div>
+            <div>
+                <strong style="color: white; display: block; margin-bottom: 5px;"><i class="fa-solid fa-robot"></i> Lifey AI</strong>
+                Your context-aware AI coach, monitoring your entire system 24/7.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Random Motivational Quotes
+    const quotes = [
+        "\"Focus on the process, not the outcome.\"",
+        "\"Amateurs sit and wait for inspiration. The rest of us just get up and go to work.\"",
+        "\"The obstacle in the path becomes the path. Never forget, within every obstacle is an opportunity to improve our condition.\"",
+        "\"Discipline equals freedom.\"",
+        "\"What you do today can improve all your tomorrows.\"",
+        "\"You do not rise to the level of your goals. You fall to the level of your systems.\""
+    ];
+    
+    // Pick a random quote and set it on load
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById('daily-quote').innerText = randomQuote;
+
+    // 2. Scroll Fade-Up Animation (Intersection Observer)
+    document.addEventListener("DOMContentLoaded", function() {
+        const reveals = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // Optional: Stop observing once revealed
+                    // observer.unobserve(entry.target); 
+                }
+            });
+        }, {
+            threshold: 0.15, // Trigger when 15% of the element is visible
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        reveals.forEach(reveal => {
+            revealOnScroll.observe(reveal);
+        });
+    });
+</script>
 
 {% endblock %}

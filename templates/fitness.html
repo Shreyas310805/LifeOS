@@ -1,63 +1,105 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="header">
-    <div class="welcome-text">
-        <h2>💪 Fitness Log</h2>
-        <p>Track your physical progress.</p>
-    </div>
-    
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div style="text-align: center; margin-bottom: 40px;">
+    <h1>
+        <i class="fa-solid fa-heart-pulse" style="color: black; margin-right: 10px;"></i>
+        Health & Vitality
+    </h1>
+    <p style="color: #6B7280;">7-Day biological hardware analytics.</p>
+</div>
+
+<div style="text-align: center; margin-bottom: 40px;">
     {% if user.is_connected %}
-        <div style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-            {% if user.profile_pic %}
-                <img src="{{ user.profile_pic }}" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid #4ade80;">
-            {% else %}
-                <span style="font-size: 1.5rem;">👤</span>
-            {% endif %}
-            
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                <span style="font-size: 0.8rem; color: #4ade80; font-weight: bold;">Connected</span>
-                <a href="{{ url_for('logout_fit') }}" style="font-size: 0.75rem; color: #ef4444; text-decoration: none;">Disconnect</a>
-            </div>
-        </div>
+        <a href="/logout_fit" style="background: white; color: black; border: 2px solid #E5E7EB; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-weight: bold; transition: all 0.2s;">
+            <i class="fa-brands fa-google" style="color: black;"></i> Connected as {{ user.name }}
+        </a>
     {% else %}
-        <a href="{{ url_for('login_google') }}" class="verify-btn" style="background: #4285F4; text-decoration: none; display: flex; align-items: center; gap: 8px;">
-            <span>🔄</span> Sync with Google Fit
+        <a href="/login_google" style="background: black; color: white; padding: 15px 30px; border-radius: 30px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">
+            <i class="fa-brands fa-google" style="color: white; margin-right: 8px;"></i> Sync Google Fit
         </a>
     {% endif %}
 </div>
 
-<div class="stats-row" style="margin-top: 2rem;">
-    
-    <div class="stat-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid #334155;">
-        <div style="font-size: 3rem; margin-bottom: 0.5rem;">👣</div>
-        <div class="stat-value" style="color: #4ade80; font-size: 2.5rem;">
-            {{ user.steps if user.steps else 0 }}
-        </div>
-        <div class="xp-label">Steps Today</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px; margin: 0 auto 30px auto;">
+    <div class="stat-box" style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 25px; text-align: center;">
+        <i class="fa-solid fa-shoe-prints" style="font-size: 2rem; color: black; margin-bottom: 10px;"></i>
+        <div style="font-size: 2rem; font-weight: 900; color: black; line-height: 1;">{{ user.steps }}</div>
+        <div style="font-size: 0.8rem; color: #9CA3AF; font-weight: bold; margin-top: 10px;">STEPS TODAY</div>
     </div>
-
-    <div class="stat-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid #334155;">
-        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔥</div>
-        <div class="stat-value" style="color: #fb923c; font-size: 2.5rem;">
-            {{ user.calories if user.calories else 0 }}
-        </div>
-        <div class="xp-label">Calories Burned</div>
+    <div class="stat-box" style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 25px; text-align: center;">
+        <i class="fa-solid fa-fire" style="font-size: 2rem; color: black; margin-bottom: 10px;"></i>
+        <div style="font-size: 2rem; font-weight: 900; color: black; line-height: 1;">{{ user.calories }}</div>
+        <div style="font-size: 0.8rem; color: #9CA3AF; font-weight: bold; margin-top: 10px;">CALORIES TODAY</div>
     </div>
-
 </div>
 
-<div class="card" style="margin-top: 2rem;">
-    <h3>Daily Insight</h3>
-    <p style="color: #94a3b8; line-height: 1.6;">
-        {% if user.steps > 5000 %}
-            🚀 <strong>Crushing it!</strong> You are active and burning energy. Keep it up!
-        {% elif user.steps > 2000 %}
-            🚶 <strong>Good start!</strong> Try to take a 10-minute walk this evening to hit your goal.
-        {% else %}
-            😴 <strong>Low activity detected.</strong> Time to stand up, stretch, and get some water!
-        {% endif %}
-    </p>
+{% if user.is_connected %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="card">
+        <h3><i class="fa-solid fa-chart-column" style="margin-right: 8px;"></i> Step History</h3>
+        <canvas id="stepChart" height="200"></canvas>
+    </div>
+    <div class="card">
+        <h3><i class="fa-solid fa-fire-flame-curved" style="margin-right: 8px;"></i> Calorie History</h3>
+        <canvas id="calChart" height="200"></canvas>
+    </div>
 </div>
+
+<script>
+    // Get data directly from Python
+    const stepDataRaw = {{ user.step_history | safe }};
+    const calDataRaw = {{ user.calorie_history | safe }};
+
+    // Extract Labels (Days) and Values
+    const labels = stepDataRaw.map(d => d.day);
+    const steps = stepDataRaw.map(d => d.value);
+    const cals = calDataRaw.map(d => d.value);
+
+    // Global Chart Settings for Minimalist Look
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    const commonOptions = {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#F3F4F6' }, border: { display: false } },
+            x: { grid: { display: false }, border: { display: false } }
+        }
+    };
+
+    // 1. Render Step Chart
+    new Chart(document.getElementById('stepChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: steps,
+                backgroundColor: '#000000', // Black bars
+                borderRadius: 4
+            }]
+        },
+        options: commonOptions
+    });
+
+    // 2. Render Calorie Chart
+    new Chart(document.getElementById('calChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: cals,
+                borderColor: '#000000',
+                borderWidth: 3,
+                tension: 0.3, // Smooth curve
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#000000'
+            }]
+        },
+        options: commonOptions
+    });
+</script>
+{% endif %}
 
 {% endblock %}

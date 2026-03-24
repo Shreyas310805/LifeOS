@@ -1,156 +1,231 @@
+/* --- PREMIUM CLEAN THEME (v2 - Big & Spacious) --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap');
+
 :root {
-    --bg-color: #0f172a;
-    --card-bg: #1e293b;
-    --accent-blue: #3b82f6;
-    --accent-green: #10b981;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    --bg-color: #F3F4F6;       /* Light Grey Background */
+    --card-bg: #FFFFFF;        /* Pure White Cards */
+    --text-primary: #111827;   /* Deep Black */
+    --text-secondary: #6B7280; /* Soft Grey */
+    --accent: #000000;         /* Black Buttons */
+    --accent-hover: #374151;
+    --success: #10B981;        /* Green */
+    --danger: #EF4444;         /* Red */
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-
-body { background-color: var(--bg-color); color: var(--text-primary); display: flex; height: 100vh; overflow: hidden; }
-
-/* Sidebar */
-.sidebar { width: 260px; background-color: var(--card-bg); border-right: var(--glass-border); padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
-.logo-area { font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem; color: white; display: flex; gap: 10px; }
-.nav-item { display: flex; align-items: center; gap: 15px; padding: 12px 16px; border-radius: 12px; cursor: pointer; color: var(--text-secondary); text-decoration: none; transition: 0.3s; }
-.nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
-.nav-item.active { background: var(--accent-blue); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
-
-/* Main Content */
-.main-content { flex: 1; padding: 2rem; overflow-y: auto; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.level-badge { background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 20px; border: var(--glass-border); }
-
-/* Cards & Grid */
-.dashboard-grid { display: grid; gap: 1.5rem; }
-.card { background: var(--card-bg); border-radius: 24px; padding: 1.5rem; border: var(--glass-border); }
-
-/* Rings (Simplified for CSS) */
-.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
-.stat-card { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 1.2rem; text-align: center; display: flex; flex-direction: column; align-items: center; }
-.ring { width: 90px; height: 90px; border-radius: 50%; border: 8px solid rgba(255,255,255,0.05); margin-bottom: 0.8rem; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.4rem; }
-.ring.blue { border-top-color: var(--accent-blue); border-right-color: var(--accent-blue); border-bottom-color: var(--accent-blue); transform: rotate(-45deg); color: var(--accent-blue); }
-.ring.green { border-top-color: var(--accent-green); border-right-color: var(--accent-green); border-bottom-color: var(--accent-green); transform: rotate(-45deg); color: var(--accent-green); }
-.ring.orange { border-top-color: #f59e0b; border-right-color: #f59e0b; border-bottom-color: #f59e0b; transform: rotate(-45deg); color: #f59e0b; }
-.ring-text { transform: rotate(45deg); }
-
-/* AI Insight */
-.ai-insight { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15)); border: 1px solid rgba(139, 92, 246, 0.3); display: flex; align-items: center; gap: 1rem; }
-.ai-avatar { width: 45px; height: 45px; background: linear-gradient(to right, #3b82f6, #8b5cf6); border-radius: 12px; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; }
-
-/* Buttons */
-.verify-btn { background: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; }
-.verify-btn:hover { background: var(--accent-blue); color: white; }
-/* --- TASK LIST STYLING (Paste this at the bottom) --- */
-
-.task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Spacing between tasks */
-}
-
-.task-item {
-    background: rgba(255,255,255,0.05);
-    padding: 1rem 1.5rem;
-    border-radius: 16px;
-    display: flex; 
-    justify-content: space-between; /* Pushes text to left, button to right */
-    align-items: center; 
-    border: 1px solid transparent;
-    transition: 0.2s;
-}
-
-.task-item:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(255,255,255,0.1);
-}
-
-.task-info {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.task-info h4 {
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
     margin: 0;
-    color: #fff;
-    font-size: 1.1rem;
+    padding: 0;
+    font-size: 16px; /* ⬆️ Increased Base Font Size */
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
-.task-info p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #94a3b8;
-}
-/* --- NEW STYLES FOR XP & DELETE --- */
-
-/* The Gold Total XP Card */
-.xp-card {
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    border: 1px solid #FFD700;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+/* --- NAVIGATION --- */
+nav {
+    background: var(--card-bg);
+    border-bottom: 1px solid #E5E7EB;
+    padding: 20px 0; /* More breathing room */
 }
 
-.xp-value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #000; /* Black text for contrast on gold */
+.nav-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.xp-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: rgba(0,0,0,0.7);
-}
-
-/* Delete Button Styling */
-.task-actions {
+.logo {
+    font-size: 1.5rem; /* Bigger Logo */
+    font-weight: 900;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -1px;
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between Complete and Delete */
+    gap: 12px;
 }
 
-.delete-btn {
+.nav-links a {
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: 1.2rem;
-    padding: 5px 10px;
-    border-radius: 8px;
-    transition: 0.2s;
-    background: rgba(255, 0, 0, 0.1);
-    border: 1px solid rgba(255, 0, 0, 0.3);
+    font-weight: 600;
+    margin-left: 35px;
+    font-size: 1rem;
+    transition: color 0.2s;
 }
 
-.delete-btn:hover {
-    background: rgba(255, 0, 0, 0.3);
-    transform: scale(1.1);
+.nav-links a:hover { color: var(--text-primary); }
+
+/* --- LAYOUT --- */
+.container {
+    max-width: 900px; /* Slightly narrower for better focus */
+    margin: 50px auto;
+    padding: 0 25px;
 }
 
-.status-done {
-    color: #4ade80; /* Green color for Done text */
-    font-weight: bold;
+/* --- TYPOGRAPHY --- */
+h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    margin-bottom: 10px;
+    line-height: 1.1;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+p {
+    color: var(--text-secondary);
+    font-size: 1.1rem; /* Bigger Paragraphs */
+    margin-bottom: 20px;
+}
+
+/* --- CARDS (Spacious) --- */
+.card {
+    background: var(--card-bg);
+    border: 1px solid #E5E7EB;
+    border-radius: 16px; /* Softer Corners */
+    padding: 40px; /* ⬆️ Massive Padding Increase */
+    margin-bottom: 40px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* --- STATS GRID --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-box {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    display: block;
+}
+
+.stat-label {
     font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
-/* --- LIFEY WIDGET --- */
+
+/* --- FORMS & INPUTS (Big & Clickable) --- */
+label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: block;
+}
+
+input, select {
+    width: 100%;
+    padding: 16px; /* ⬆️ Bigger Click Area */
+    border: 2px solid #E5E7EB;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: white;
+}
+
+/* --- BUTTONS --- */
+button, .add-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 16px 32px; /* Bigger Buttons */
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 100%;
+    transition: transform 0.1s;
+}
+
+button:hover { transform: translateY(-2px); }
+
+/* --- TASK LIST --- */
+.task-card {
+    background: #F9FAFB;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #E5E7EB;
+}
+
+.task-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.task-meta { margin-top: 8px; }
+
+.xp-tag {
+    background: #FEF3C7;
+    color: #D97706;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* --- CHAT --- */
+/* --- FIXED LIFEY CHAT WIDGET --- */
 #lifey-icon {
     position: fixed;
     bottom: 30px;
     right: 30px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
+    background: #000000; /* Black Button */
     border-radius: 50%;
     color: white;
-    font-size: 30px;
+    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     transition: transform 0.2s;
-    z-index: 1000;
+    z-index: 2000; /* Always on top */
 }
 
 #lifey-icon:hover {
@@ -158,68 +233,78 @@ body { background-color: var(--bg-color); color: var(--text-primary); display: f
 }
 
 #lifey-chat-window {
-    display: none; /* Hidden by default */
-    position: fixed;
+    display: none; /* Hidden by default! */
+    position: fixed; /* FLOATING */
     bottom: 100px;
     right: 30px;
     width: 350px;
     height: 450px;
-    background: #1e293b;
+    background: white;
     border-radius: 12px;
-    border: 1px solid #334155;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    border: 1px solid #E5E7EB;
     flex-direction: column;
-    z-index: 1000;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    overflow: hidden;
+    z-index: 2000; /* Always on top */
 }
 
 .chat-header {
+    background: #000000;
+    color: white;
     padding: 15px;
-    background: #0f172a;
-    border-bottom: 1px solid #334155;
-    border-radius: 12px 12px 0 0;
-    font-weight: bold;
+    font-weight: 700;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .chat-content {
     flex: 1;
     padding: 15px;
     overflow-y: auto;
-    font-size: 0.9rem;
+    background: #F9FAFB;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .chat-input-area {
-    padding: 10px;
-    border-top: 1px solid #334155;
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #E5E7EB;
     display: flex;
     gap: 10px;
 }
 
-.chat-input-area input {
-    flex: 1;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #334155;
-    background: #0f172a;
-    color: white;
-}
-
+/* Chat Bubbles */
 .ai-msg {
-    background: #334155;
-    padding: 8px 12px;
-    border-radius: 10px 10px 10px 0;
-    margin-bottom: 10px;
     align-self: flex-start;
+    background: white;
+    border: 1px solid #E5E7EB;
+    color: #111827;
+    padding: 10px 14px;
+    border-radius: 12px 12px 12px 0;
     max-width: 80%;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .user-msg {
-    background: #6366f1;
-    padding: 8px 12px;
-    border-radius: 10px 10px 0 10px;
-    margin-bottom: 10px;
-    margin-left: auto; /* Push to right */
-    width: fit-content;
+    align-self: flex-end;
+    background: #000000;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 12px 12px 0 12px;
     max-width: 80%;
+    font-size: 0.9rem;
+}
+
+/* --- ACTIVE NAV TAB HIGHLIGHT (High Contrast) --- */
+.nav-links a.active {
+    background: #000000 !important; /* Force Black */
+    color: #FFFFFF !important;      /* Force White Text */
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* Add a little pop */
+    transform: translateY(-1px);
 }

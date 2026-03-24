@@ -2,92 +2,98 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LifeOS</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo-area">LifeOS 🧬</div>
-        
-        <a href="{{ url_for('dashboard') }}" class="nav-item {% if page == 'dashboard' %}active{% endif %}">
-            <div class="nav-icon">🏠</div> <span>Dashboard</span>
-        </a>
-        
-        <a href="{{ url_for('tasks') }}" class="nav-item {% if page == 'tasks' %}active{% endif %}">
-            <div class="nav-icon">✅</div> <span>Task Manager</span>
-        </a>
-        
-        <a href="{{ url_for('fitness') }}" class="nav-item {% if page == 'fitness' %}active{% endif %}">
-            <div class="nav-icon">💪</div> <span>Fitness Log</span>
-        </a>
-        
-        <a href="{{ url_for('social') }}" class="nav-item {% if page == 'social' %}active{% endif %}">
-            <div class="nav-icon">🏆</div> <span>Social Hub</span>
-        </a>
-    </div>
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fa-solid fa-trophy"></i> LifeOS
+            </a>
+            <div class="nav-links">
+                
+                <a href="/" class="{{ 'active' if request.path == '/' or request.path == '/dashboard' else '' }}">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                
+                <a href="/tasks" class="{{ 'active' if '/tasks' in request.path else '' }}">
+                    <i class="fa-solid fa-list-check"></i> Tasks
+                </a>
+                
+                <a href="/fitness" class="{{ 'active' if '/fitness' in request.path else '' }}">
+                    <i class="fa-solid fa-heart-pulse"></i> Fitness
+                </a>
+                
+                <a href="/social" class="{{ 'active' if '/social' in request.path else '' }}">
+                    <i class="fa-solid fa-users"></i> Squad
+                </a>
+                <a href="/health" class="{{ 'active' if '/health' in request.path else '' }}">
+                    <i class="fa-solid fa-notes-medical"></i> Medical
+                </a>
 
-    <div class="main-content">
-        
+            </div>
+        </div>
+    </nav>
 
+    <div class="container">
         {% block content %}{% endblock %}
     </div>
-<div id="lifey-icon" onclick="toggleChat()">
-    🤖
-</div>
 
-<div id="lifey-chat-window">
-    <div class="chat-header">
-        <span>Chat with Lifey</span>
-        <span onclick="toggleChat()" style="cursor: pointer;">✖</span>
+    <div id="lifey-icon" onclick="toggleChat()">
+        <i class="fa-solid fa-robot"></i>
     </div>
-    <div id="chat-content" class="chat-content">
-        <div class="ai-msg">Hi Shreyas! I'm Lifey. How can I help you crush your goals today? 🚀</div>
+
+    <div id="lifey-chat-window">
+        <div class="chat-header">
+            <span><i class="fa-solid fa-brain"></i> Coach Lifey</span>
+            <span onclick="toggleChat()" style="cursor: pointer;"><i class="fa-solid fa-xmark"></i></span>
+        </div>
+        <div id="chat-content" class="chat-content">
+            <div class="ai-msg">Ready to focus? What's the priority?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="user-input" placeholder="Type here..." onkeypress="handleEnter(event)">
+            <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
     </div>
-    <div class="chat-input-area">
-        <input type="text" id="user-input" placeholder="Ask about tasks or fitness..." onkeypress="handleEnter(event)">
-        <button onclick="sendMessage()">➤</button>
-    </div>
-</div>
 
-<script>
-    function toggleChat() {
-        var chat = document.getElementById("lifey-chat-window");
-        chat.style.display = chat.style.display === "none" || chat.style.display === "" ? "flex" : "none";
-    }
-
-    function handleEnter(e) {
-        if (e.key === 'Enter') sendMessage();
-    }
-
-    async function sendMessage() {
-        var input = document.getElementById("user-input");
-        var content = document.getElementById("chat-content");
-        var text = input.value;
-        if (!text) return;
-
-        // User Message
-        content.innerHTML += `<div class="user-msg">${text}</div>`;
-        input.value = "";
-        content.scrollTop = content.scrollHeight;
-
-        // Send to Backend
-        try {
-            const response = await fetch('/ask_lifey', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
-            });
-            const data = await response.json();
-            
-            // AI Reply
-            content.innerHTML += `<div class="ai-msg">${data.reply}</div>`;
-            content.scrollTop = content.scrollHeight;
-        } catch (error) {
-            content.innerHTML += `<div class="ai-msg">Error contacting Lifey :(</div>`;
+    <script>
+        function toggleChat() {
+            var chat = document.getElementById("lifey-chat-window");
+            chat.style.display = chat.style.display === "none" || chat.style.display === "" ? "flex" : "none";
         }
-    }
-</script>
-
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+        async function sendMessage() {
+            var input = document.getElementById("user-input");
+            var content = document.getElementById("chat-content");
+            var text = input.value;
+            if (!text) return;
+            content.innerHTML += `<div class="user-msg">${text}</div>`;
+            input.value = "";
+            content.scrollTop = content.scrollHeight;
+            try {
+                const response = await fetch('/ask_lifey', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await response.json();
+                content.innerHTML += `<div class="ai-msg">${data.reply}</div>`;
+                content.scrollTop = content.scrollHeight;
+            } catch (error) {
+                content.innerHTML += `<div class="ai-msg">Connection Error.</div>`;
+            }
+        }
+    </script>
 </body>
 </html>

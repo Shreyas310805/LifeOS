@@ -1,15 +1,15 @@
-from google import genai
-import os
+import google.generativeai as genai
 
+# Paste your key directly here for a quick check
+GOOGLE_API_KEY = "AIzaSyBwdQOzoRsSVxYdpW0NMAfGrtrAe6weuac"
 
-GOOGLE_API_KEY = ""
+genai.configure(api_key=GOOGLE_API_KEY)
 
-client = genai.Client(api_key=GOOGLE_API_KEY)
-
-print("Checking available models...")
+print("🔎 SCANNING FOR AVAILABLE MODELS...")
 try:
-   
-    for model in client.models.list():
-        print(f"✅ Found: {model.name}")
+    # This will list all models your key can access
+    for m in genai.list_models():
+        if 'generateContent' in m.supported_generation_methods:
+            print(f"✅ FOUND: {m.name}")
 except Exception as e:
-    print(f"❌ Error: {e}")
+    print(f"❌ ERROR: {e}")

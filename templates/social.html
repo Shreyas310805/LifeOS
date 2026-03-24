@@ -1,8 +1,77 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="card">
-    <h3>🏆 Social Hub</h3>
-    <br>
-    <p>Connect with Riya, Prakhar, and Vaibhav here.</p>
+
+<div style="text-align: center; margin-bottom: 40px;">
+    <h1>
+        <i class="fa-solid fa-users-viewfinder" style="color: black; margin-right: 10px;"></i>
+        Squad Command
+    </h1>
+    <p style="color: #6B7280;">Compete with your friends and track progress.</p>
 </div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+    
+    <div class="card">
+        <h3 style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #F3F4F6; padding-bottom: 15px;">
+            <i class="fa-solid fa-ranking-star" style="margin-right: 8px;"></i> Global Leaderboard
+        </h3>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; background: black; color: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="background: white; color: black; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">
+                    1
+                </div>
+                <div>
+                    <h4 style="margin: 0; font-size: 1.1rem;">{{ user.name }} (You)</h4>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-weight: 900; font-size: 1.2rem;">Lvl {{ user.level }}</div>
+                <div style="font-size: 0.85rem; color: #D1D5DB;"><i class="fa-solid fa-bolt"></i> {{ user.total_xp }} XP</div>
+            </div>
+        </div>
+
+        {% for member in squad %}
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #F9FAFB; border: 1px solid #E5E7EB; padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; transition: transform 0.2s;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="background: #E5E7EB; color: #4B5563; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem;">
+                    {{ loop.index + 1 }}
+                </div>
+                <div>
+                    <h4 style="margin: 0; font-size: 1.05rem; color: black;">{{ member.name }}</h4>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: 900; font-size: 1.1rem; color: black;">Lvl {{ member.level }}</div>
+                    <div style="font-size: 0.85rem; color: #6B7280;"><i class="fa-solid fa-bolt"></i> {{ member.xp }} XP</div>
+                </div>
+                <a href="/delete_squad/{{ member.id }}" style="color: #9CA3AF; padding: 5px;" title="Remove Member">
+                    <i class="fa-solid fa-xmark"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card" style="height: fit-content;">
+        <h3 style="margin-top: 0; margin-bottom: 20px;"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i> Recruit Member</h3>
+        
+        <form action="/add_squad" method="POST">
+            <label>Friend's Name</label>
+            <input type="text" name="name" placeholder="Enter name..." required style="margin-bottom: 20px;">
+            
+            <button type="submit" style="background: black; color: white; width: 100%;">
+                <i class="fa-solid fa-satellite-dish" style="margin-right: 8px;"></i> Send Invite
+            </button>
+        </form>
+        
+        <div style="margin-top: 25px; font-size: 0.85rem; color: #6B7280; text-align: center; border-top: 1px dashed #E5E7EB; padding-top: 15px;">
+            Squad XP is simulated for offline recruits. They will sync automatically when they create a LifeOS account.
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}
