@@ -1,0 +1,182 @@
+{% extends "base.html" %} {% block content %}
+
+<div style="text-align: center; margin-bottom: 40px">
+  <h1>
+    <i
+      class="fa-solid fa-users-viewfinder"
+      style="color: black; margin-right: 10px"></i>
+    Squad Command
+  </h1>
+  <p style="color: #6b7280">Compete with your friends and track progress.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px">
+  <div class="card">
+    <h3
+      style="
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f3f4f6;
+        padding-bottom: 15px;
+      ">
+      <i class="fa-solid fa-ranking-star" style="margin-right: 8px"></i> Global
+      Leaderboard
+    </h3>
+
+    {% for member in squad %} {% if member.id == user.id %}
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: black;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      ">
+      <div style="display: flex; align-items: center; gap: 15px">
+        <div
+          style="
+            background: white;
+            color: black;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+          ">
+          {{ loop.index }}
+        </div>
+        <div>
+          <h4 style="margin: 0; font-size: 1.1rem">{{ member.name }} (You)</h4>
+        </div>
+      </div>
+      <div style="text-align: right">
+        <div style="font-weight: 900; font-size: 1.2rem">
+          Lvl {{ member.level }}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db">
+          <i class="fa-solid fa-bolt"></i> {{ member.total_xp }} XP
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        transition: transform 0.2s;
+      ">
+      <div style="display: flex; align-items: center; gap: 15px">
+        <div
+          style="
+            background: #e5e7eb;
+            color: #4b5563;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+          ">
+          {{ loop.index }}
+        </div>
+        <div>
+          <h4 style="margin: 0; font-size: 1.05rem; color: black">
+            {{ member.name }}
+          </h4>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 20px">
+        <div style="text-align: right">
+          <div style="font-weight: 900; font-size: 1.1rem; color: black">
+            Lvl {{ member.level }}
+          </div>
+          <div style="font-size: 0.85rem; color: #6b7280">
+            <i class="fa-solid fa-bolt"></i> {{ member.total_xp }} XP
+          </div>
+        </div>
+        <a
+          href="/remove_friend/{{ member.id }}"
+          style="color: #9ca3af; padding: 5px"
+          title="Remove Member"
+          onclick="return confirm('Remove {{ member.name }} from your squad?');">
+          <i class="fa-solid fa-xmark"></i>
+        </a>
+      </div>
+    </div>
+    {% endif %} {% else %}
+    <p style="text-align: center; color: #6b7280; margin-top: 30px">
+      Your squad is empty! Add a friend code to start competing.
+    </p>
+    {% endfor %}
+  </div>
+
+  <div class="card" style="height: fit-content">
+    <h3 style="margin-top: 0; margin-bottom: 20px">
+      <i class="fa-solid fa-user-plus" style="margin-right: 8px"></i> Recruit
+      Member
+    </h3>
+
+    <form action="/add_friend" method="POST">
+      <label>Friend's Secret Code</label>
+      <input
+        type="text"
+        name="friend_code"
+        placeholder="e.g. FIT-A9X2B"
+        required
+        style="
+          margin-bottom: 20px;
+          text-transform: uppercase;
+          width: 100%;
+          box-sizing: border-box;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        " />
+
+      <button
+        type="submit"
+        style="
+          background: black;
+          color: white;
+          width: 100%;
+          padding: 12px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        ">
+        <i class="fa-solid fa-satellite-dish" style="margin-right: 8px"></i> Add
+        Friend
+      </button>
+    </form>
+
+    <div
+      style="
+        margin-top: 25px;
+        font-size: 0.85rem;
+        color: #6b7280;
+        text-align: center;
+        border-top: 1px dashed #e5e7eb;
+        padding-top: 15px;
+      ">
+      Tell your friends to find their unique code on their dashboard to add them
+      to your squad!
+    </div>
+  </div>
+</div>
+
+{% endblock %}

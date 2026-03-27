@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="text-align: center; margin-bottom: 40px;">
+    <h1>
+        <i class="fa-solid fa-bullseye" style="color: black; margin-right: 10px;"></i>
+        STOP PROCRASTINATING.
+    </h1>
+    <p style="color: #6B7280;">Log your missions. Let the AI judge you.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+    
+    <div class="card">
+        <h3><i class="fa-solid fa-plus" style="color: black; margin-right: 8px;"></i> New Mission</h3>
+        
+        <form action="/add_task" method="POST">
+            <label>Task Name</label>
+            <input type="text" name="task_name" placeholder="e.g. Finish Chapter 4" required>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>Category</label>
+                    <select name="category">
+                        <option>💼 Work</option>
+                        <option>📚 Study</option>
+                        <option>💪 Fitness</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Due Date</label>
+                    <input type="date" name="due_date">
+                </div>
+                <div>
+                    <label>Time</label>
+                    <input type="time" name="due_time">
+                </div>
+            </div>
+
+            <button type="submit" style="background: black; color: white; margin-top: 20px;">
+                <i class="fa-solid fa-play" style="margin-right: 8px;"></i> INITIATE TASK
+            </button>
+        </form>
+    </div>
+
+    <div class="card" style="background: black; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        <i class="fa-solid fa-tower-broadcast" style="font-size: 3rem; margin-bottom: 20px; color: #F3F4F6;"></i>
+        
+        <h3 style="color: white; margin-bottom: 5px;">CURRENT STATUS</h3>
+        <h1 style="font-size: 4rem; margin: 0; line-height: 1;">{{ tasks|selectattr("status", "equalto", "Pending")|list|length }}</h1>
+        <p style="color: #9CA3AF; margin-top: 5px;">ACTIVE TARGETS</p>
+        
+        <p style="font-size: 0.8rem; color: #6B7280; margin-top: 20px;">
+            "Lifey" is watching.<br>Don't let your squad beat you.
+        </p>
+    </div>
+
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <h3><i class="fa-solid fa-list-check" style="color: black; margin-right: 8px;"></i> Active Operations</h3>
+
+    {% if tasks|length == 0 %}
+        <div style="text-align: center; padding: 40px; color: #9CA3AF; border: 2px dashed #E5E7EB; border-radius: 12px;">
+            <i class="fa-solid fa-mug-hot" style="font-size: 1.5rem; margin-bottom: 10px; display: block;"></i>
+            No active tasks. You're either very efficient or very lazy.
+        </div>
+    {% else %}
+        {% for task in tasks %}
+        <div class="task-card" style="border-left: 5px solid {% if task.status == 'Done' %}#10B981{% else %}#000000{% endif %};">
+            <div>
+                <div class="task-title" style="{% if task.status == 'Done' %}text-decoration: line-through; color: #9CA3AF;{% endif %}">
+                    {{ task.title }}
+                </div>
+                <div class="task-meta">
+                    <span style="background: #F3F4F6; color: black; padding: 4px 10px; border-radius: 5px; font-weight: bold; font-size: 0.8rem;">
+                        <i class="fa-solid fa-bolt"></i> {{ task.xp }} XP
+                    </span>
+                    {% if task.due_date %}
+                    <span style="color: #DC2626; font-size: 0.85rem; margin-left: 10px;">
+                        <i class="fa-regular fa-clock"></i> {{ task.due_date }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                {% if task.status == "Pending" %}
+                    <a href="/complete/{{ task.id }}" style="color: black; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
+                        <i class="fa-regular fa-square"></i> Mark Done
+                    </a>
+                {% else %}
+                    <span style="color: #10B981; font-weight: bold; font-size: 0.9rem;">
+                        <i class="fa-solid fa-check-square"></i> Complete
+                    </span>
+                {% endif %}
+                <a href="/delete/{{ task.id }}" style="color: #9CA3AF; margin-left: 10px;">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+{% endblock %}

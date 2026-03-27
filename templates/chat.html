@@ -1,0 +1,208 @@
+{% extends "base.html" %} {% block title %}AI Coach - LifeOS{% endblock %} {%
+block content %}
+<div
+  style="
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+  ">
+  <div
+    style="
+      background: white;
+      padding: 20px;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 10;
+    ">
+    <div
+      style="
+        background: #667eea;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+      ">
+      🤖
+    </div>
+    <div>
+      <h2 style="margin: 0; color: #333">Lifey</h2>
+      <p style="margin: 0; color: #4ade80; font-size: 0.9em">
+        🟢 Online - Your strict AI Coach
+      </p>
+    </div>
+  </div>
+
+  <div
+    id="chat-box"
+    style="
+      flex-grow: 1;
+      background: #f8f9fa;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      border-left: 1px solid #eee;
+      border-right: 1px solid #eee;
+    ">
+    <div
+      style="
+        align-self: flex-start;
+        background: white;
+        padding: 15px 20px;
+        border-radius: 15px 15px 15px 0;
+        max-width: 75%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eee;
+      ">
+      <strong style="color: #667eea; display: block; margin-bottom: 5px"
+        >Lifey</strong
+      >
+      Listen up, {{ user.name }}! I have your health conditions and task list
+      right in front of me. What are we tackling today? No excuses! 💪
+    </div>
+  </div>
+
+  <div
+    style="
+      background: white;
+      padding: 20px;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      gap: 10px;
+    ">
+    <input
+      type="text"
+      id="user-input"
+      placeholder="Ask Lifey for advice, workout tips, or a reality check..."
+      style="
+        flex-grow: 1;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+      " />
+    <button
+      id="send-btn"
+      style="
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 0 25px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.2s;
+      ">
+      Send 🚀
+    </button>
+  </div>
+</div>
+
+<script>
+  const chatBox = document.getElementById("chat-box");
+  const userInput = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
+
+  // Helper to scroll to bottom
+  function scrollToBottom() {
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // Append a message to the UI
+  function appendMessage(sender, text, isUser) {
+    const msgDiv = document.createElement("div");
+    msgDiv.style.padding = "15px 20px";
+    msgDiv.style.maxWidth = "75%";
+    msgDiv.style.boxShadow = "0 2px 5px rgba(0,0,0,0.05)";
+    msgDiv.style.border = "1px solid #eee";
+    msgDiv.style.lineHeight = "1.5";
+
+    if (isUser) {
+      msgDiv.style.alignSelf = "flex-end";
+      msgDiv.style.background = "#667eea";
+      msgDiv.style.color = "white";
+      msgDiv.style.borderRadius = "15px 15px 0 15px";
+      msgDiv.innerHTML = `<strong>You</strong><br>${text}`;
+    } else {
+      msgDiv.style.alignSelf = "flex-start";
+      msgDiv.style.background = "white";
+      msgDiv.style.color = "#333";
+      msgDiv.style.borderRadius = "15px 15px 15px 0";
+      // Convert markdown-style asterisks to bold if Gemini returns them
+      let formattedText = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      msgDiv.innerHTML = `<strong style="color: #667eea; display: block; margin-bottom: 5px;">Lifey</strong>${formattedText}`;
+    }
+
+    chatBox.appendChild(msgDiv);
+    scrollToBottom();
+  }
+
+  // Handle sending the message
+  async function sendMessage() {
+    const text = userInput.value.trim();
+    if (!text) return;
+
+    // 1. Show user message
+    appendMessage("You", text, true);
+    userInput.value = "";
+
+    // Disable input while waiting
+    userInput.disabled = true;
+    sendBtn.disabled = true;
+    sendBtn.innerText = "Thinking...";
+
+    try {
+      // 2. Send to Flask backend
+      const response = await fetch("/ask_lifey", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: text }),
+      });
+
+      const data = await response.json();
+
+      // 3. Show Lifey's reply
+      appendMessage("Lifey", data.reply, false);
+    } catch (error) {
+      console.error("Error:", error);
+      appendMessage(
+        "Lifey",
+        "Oops, my connection dropped. Try that again!",
+        false,
+      );
+    } finally {
+      // Re-enable input
+      userInput.disabled = false;
+      sendBtn.disabled = false;
+      sendBtn.innerText = "Send 🚀";
+      userInput.focus();
+    }
+  }
+
+  // Send on button click
+  sendBtn.addEventListener("click", sendMessage);
+
+  // Send on 'Enter' key press
+  userInput.addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  });
+</script>
+{% endblock %}

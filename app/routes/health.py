@@ -1,45 +1,37 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_required, current_user
-from app import db
-from app.models import HealthMetric
+from google.cloud import firestore
+from datetime import datetime, timezone
 
 bp = Blueprint('health', __name__)
-
 
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
-    metrics = HealthMetric.query.filter_by(user_id=current_user.id).order_by(HealthMetric.recorded_at.desc()).all()
+    db = current_app.config['db']
+    metrics = [{"id": doc.id, **doc.to_dict()} for doc in db.collection('health_metrics').where('user_id', '==', current_user.id).order_by('recorded_at', direction=firestore.Query.DESCENDING).stream()]
     return render_template('health.html', metrics=metrics)
 
-
-@bp.route('/add', methods=['GET', 'POST'])  # <-- ADD POST HERE
+@bp.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
     if request.method == 'POST':
-        metric_type = request.form.get('metric_type')
-        value = request.form.get('value', type=float)
-        unit = request.form.get('unit')
-        notes = request.form.get('notes')
-
-        metric = HealthMetric(
-            user_id=current_user.id,
-            metric_type=metric_type,
-            value=value,
-            unit=unit,
-            notes=notes
-        )
-        db.session.add(metric)
-        db.session.commit()
+        db = current_app.config['db']
+        db.collection('health_metrics').add({
+            'user_id': current_user.id,
+            'metric_type': request.form.get('metric_type'),
+            'value': request.form.get('value', type=float),
+            'unit': request.form.get('unit'),
+            'notes': request.form.get('notes'),
+            'recorded_at': datetime.now(timezone.utc)
+        })
         flash('Health metric recorded!', 'success')
         return redirect(url_for('health.index'))
-
-    # GET request - show form
     return render_template('health_add.html')
-
 
 @bp.route('/api/metrics', methods=['GET'])
 @login_required
 def api_metrics():
-    metrics = HealthMetric.query.filter_by(user_id=current_user.id).all()
-    return jsonify([m.to_dict() for m in metrics])
+    db = current_app.config['db']
+    metrics = [{"id": doc.id, **doc.to_dict()} for doc in db.collection('health_metrics').where('user_id', '==', current_user.id).stream()]
+    return jsonify(metrics)

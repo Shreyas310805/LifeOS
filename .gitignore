@@ -37,3 +37,5 @@ logs/
 .coverage
 htmlcov/
 .pytest_cache/
+
+firebase-credentials.json

@@ -1,67 +1,57 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
-from app import db
-from app.models import Task
+from google.cloud import firestore
+from datetime import datetime, timezone
 
 bp = Blueprint('tasks', __name__)
-
 
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
-    tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.created_at.desc()).all()
+    db = current_app.config['db']
+    tasks = [{"id": doc.id, **doc.to_dict()} for doc in db.collection('tasks').where('user_id', '==', current_user.id).order_by('created_at', direction=firestore.Query.DESCENDING).stream()]
     return render_template('tasks.html', tasks=tasks)
 
-
-@bp.route('/add', methods=['GET', 'POST'])  # <-- ADD POST HERE
+@bp.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
     if request.method == 'POST':
-        title = request.form.get('title')
-        description = request.form.get('description')
-        category = request.form.get('category', 'general')
-        priority = request.form.get('priority', 'medium')
-
-        task = Task(
-            user_id=current_user.id,
-            title=title,
-            description=description,
-            category=category,
-            priority=priority
-        )
-        db.session.add(task)
-        db.session.commit()
+        db = current_app.config['db']
+        db.collection('tasks').add({
+            'user_id': current_user.id,
+            'title': request.form.get('title'),
+            'description': request.form.get('description'),
+            'category': request.form.get('category', 'general'),
+            'priority': request.form.get('priority', 'medium'),
+            'status': 'pending',
+            'created_at': datetime.now(timezone.utc)
+        })
         flash('Task added successfully!', 'success')
         return redirect(url_for('tasks.index'))
+    return render_template('tasks_add.html')
 
-    # GET request - show form
-    return render_template('tasks_add.html')  # Create this template
-
-
-@bp.route('/complete/<int:id>', methods=['POST'])  # <-- CHANGE TO POST
+@bp.route('/complete/<id>', methods=['POST'])
 @login_required
 def complete(id):
-    task = Task.query.get_or_404(id)
-    if task.user_id != current_user.id:
+    db = current_app.config['db']
+    task_ref = db.collection('tasks').document(id)
+    task = task_ref.get().to_dict()
+    if not task or task.get('user_id') != current_user.id:
         flash('Unauthorized', 'error')
-        return redirect(url_for('tasks.index'))
-
-    task.status = 'completed'
-    task.completed_at = db.func.now()
-    db.session.commit()
-    flash('Task completed!', 'success')
+    else:
+        task_ref.update({'status': 'completed', 'completed_at': datetime.now(timezone.utc)})
+        flash('Task completed!', 'success')
     return redirect(url_for('tasks.index'))
 
-
-@bp.route('/delete/<int:id>', methods=['POST'])  # <-- CHANGE TO POST
+@bp.route('/delete/<id>', methods=['POST'])
 @login_required
 def delete(id):
-    task = Task.query.get_or_404(id)
-    if task.user_id != current_user.id:
+    db = current_app.config['db']
+    task_ref = db.collection('tasks').document(id)
+    task = task_ref.get().to_dict()
+    if not task or task.get('user_id') != current_user.id:
         flash('Unauthorized', 'error')
-        return redirect(url_for('tasks.index'))
-
-    db.session.delete(task)
-    db.session.commit()
-    flash('Task deleted!', 'success')
+    else:
+        task_ref.delete()
+        flash('Task deleted!', 'success')
     return redirect(url_for('tasks.index'))

@@ -1,30 +1,29 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_migrate import Migrate
 from flask_cors import CORS
 from config import config
+import firebase_admin
+from firebase_admin import credentials, firestore
 
-db = SQLAlchemy()
 login_manager = LoginManager()
-migrate = Migrate()
 cors = CORS()
-
 
 def create_app(config_name='development'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    # Initialize extensions
-    db.init_app(app)
+    if not firebase_admin._apps:
+        cred = credentials.Certificate(app.config['FIREBASE_CREDENTIALS'])
+        firebase_admin.initialize_app(cred)
+    
+    app.config['db'] = firestore.client()
+
     login_manager.init_app(app)
-    migrate.init_app(app, db)
     cors.init_app(app)
 
     login_manager.login_view = 'auth.login'
     login_manager.login_message_category = 'info'
 
-    # Register blueprints
     from app.routes import auth, dashboard, tasks, fitness, social, health, nutrition, sleep, ai_chat
 
     app.register_blueprint(auth.bp)
@@ -37,15 +36,9 @@ def create_app(config_name='development'):
     app.register_blueprint(sleep.bp, url_prefix='/sleep')
     app.register_blueprint(ai_chat.bp, url_prefix='/ai')
 
-    # Create tables
-    with app.app_context():
-        db.create_all()
-
     return app
 
-
-# THIS IS THE CRITICAL FIX - Add user_loader callback
 @login_manager.user_loader
 def load_user(user_id):
     from app.models import User
-    return User.query.get(int(user_id))
+    return User.get(user_id)

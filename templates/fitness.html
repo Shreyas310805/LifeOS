@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div style="text-align: center; margin-bottom: 40px;">
+    <h1>
+        <i class="fa-solid fa-heart-pulse" style="color: black; margin-right: 10px;"></i>
+        Health & Vitality
+    </h1>
+    <p style="color: #6B7280;">7-Day biological hardware analytics.</p>
+</div>
+
+<div style="text-align: center; margin-bottom: 40px;">
+    {% if user.is_connected %}
+        <a href="/logout_fit" style="background: white; color: black; border: 2px solid #E5E7EB; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-weight: bold; transition: all 0.2s;">
+            <i class="fa-brands fa-google" style="color: black;"></i> Connected as {{ user.name }}
+        </a>
+    {% else %}
+        <a href="/login_google" style="background: black; color: white; padding: 15px 30px; border-radius: 30px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">
+            <i class="fa-brands fa-google" style="color: white; margin-right: 8px;"></i> Sync Google Fit
+        </a>
+    {% endif %}
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px; margin: 0 auto 30px auto;">
+    <div class="stat-box" style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 25px; text-align: center;">
+        <i class="fa-solid fa-shoe-prints" style="font-size: 2rem; color: black; margin-bottom: 10px;"></i>
+        <div style="font-size: 2rem; font-weight: 900; color: black; line-height: 1;">{{ user.steps }}</div>
+        <div style="font-size: 0.8rem; color: #9CA3AF; font-weight: bold; margin-top: 10px;">STEPS TODAY</div>
+    </div>
+    <div class="stat-box" style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 25px; text-align: center;">
+        <i class="fa-solid fa-fire" style="font-size: 2rem; color: black; margin-bottom: 10px;"></i>
+        <div style="font-size: 2rem; font-weight: 900; color: black; line-height: 1;">{{ user.calories }}</div>
+        <div style="font-size: 0.8rem; color: #9CA3AF; font-weight: bold; margin-top: 10px;">CALORIES TODAY</div>
+    </div>
+</div>
+
+{% if user.is_connected %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="card">
+        <h3><i class="fa-solid fa-chart-column" style="margin-right: 8px;"></i> Step History</h3>
+        <canvas id="stepChart" height="200"></canvas>
+    </div>
+    <div class="card">
+        <h3><i class="fa-solid fa-fire-flame-curved" style="margin-right: 8px;"></i> Calorie History</h3>
+        <canvas id="calChart" height="200"></canvas>
+    </div>
+</div>
+
+<script>
+    // Get data directly from Python
+    const stepDataRaw = {{ user.step_history | safe }};
+    const calDataRaw = {{ user.calorie_history | safe }};
+
+    // Extract Labels (Days) and Values
+    const labels = stepDataRaw.map(d => d.day);
+    const steps = stepDataRaw.map(d => d.value);
+    const cals = calDataRaw.map(d => d.value);
+
+    // Global Chart Settings for Minimalist Look
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    const commonOptions = {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#F3F4F6' }, border: { display: false } },
+            x: { grid: { display: false }, border: { display: false } }
+        }
+    };
+
+    // 1. Render Step Chart
+    new Chart(document.getElementById('stepChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: steps,
+                backgroundColor: '#000000', // Black bars
+                borderRadius: 4
+            }]
+        },
+        options: commonOptions
+    });
+
+    // 2. Render Calorie Chart
+    new Chart(document.getElementById('calChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: cals,
+                borderColor: '#000000',
+                borderWidth: 3,
+                tension: 0.3, // Smooth curve
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#000000'
+            }]
+        },
+        options: commonOptions
+    });
+</script>
+{% endif %}
+
+{% endblock %}
